@@ -1,0 +1,189 @@
+// Raidical BJJ Database Schema
+// Brazilian Jiu-Jitsu Training Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Athlete/Student profiles
+model Athlete {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?  @unique
+  photo       String?
+  belt        BeltColor @default(WHITE)
+  weight      Float?
+  joinDate    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  attendances ClassAttendance[]
+  progress    MoveProgress[]
+  mindMaps    MindMap[]
+  
+  @@map("athletes")
+}
+
+// BJJ Belt colors
+enum BeltColor {
+  WHITE
+  BLUE
+  PURPLE
+  BROWN
+  BLACK
+}
+
+// Class schedules
+model Class {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  instructor  String
+  startTime   DateTime
+  endTime     DateTime
+  maxStudents Int?
+  location    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  attendances ClassAttendance[]
+  
+  @@map("classes")
+}
+
+// Class attendance tracking
+model ClassAttendance {
+  id        String   @id @default(cuid())
+  athleteId String
+  classId   String
+  attended  Boolean  @default(false)
+  notes     String?
+  createdAt DateTime @default(now())
+  
+  // Relations
+  athlete   Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  
+  @@unique([athleteId, classId])
+  @@map("class_attendances")
+}
+
+// BJJ moves/techniques library
+model Move {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    MoveCategory
+  difficulty  Difficulty @default(BEGINNER)
+  videoUrl    String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  progress    MoveProgress[]
+  mindMapNodes MindMapNode[]
+  
+  @@map("moves")
+}
+
+// Move categories
+enum MoveCategory {
+  GUARD
+  PASSING
+  MOUNT
+  SIDE_CONTROL
+  BACK_CONTROL
+  SUBMISSIONS
+  ESCAPES
+  TAKEDOWNS
+  SWEEPS
+  TRANSITIONS
+}
+
+// Difficulty levels
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+// Athlete progress on specific moves
+model MoveProgress {
+  id        String   @id @default(cuid())
+  athleteId String
+  moveId    String
+  status    ProgressStatus @default(NOT_LEARNED)
+  notes     String?
+  lastPracticed DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  athlete   Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  move      Move    @relation(fields: [moveId], references: [id], onDelete: Cascade)
+  
+  @@unique([athleteId, moveId])
+  @@map("move_progress")
+}
+
+// Progress status for moves
+enum ProgressStatus {
+  NOT_LEARNED
+  LEARNING
+  LEARNED
+  MASTERED
+}
+
+// Mind map for strategy visualization
+model MindMap {
+  id        String   @id @default(cuid())
+  name      String
+  athleteId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  athlete   Athlete     @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  nodes     MindMapNode[]
+  
+  @@map("mind_maps")
+}
+
+// Nodes in mind maps
+model MindMapNode {
+  id        String   @id @default(cuid())
+  mindMapId String
+  moveId    String?
+  title     String
+  x         Float
+  y         Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  mindMap   MindMap @relation(fields: [mindMapId], references: [id], onDelete: Cascade)
+  move      Move?   @relation(fields: [moveId], references: [id], onDelete: SetNull)
+  
+  @@map("mind_map_nodes")
+}
+
+// Drill sessions
+model DrillSession {
+  id        String   @id @default(cuid())
+  athleteId String
+  moveId    String
+  duration  Int      // in seconds
+  notes     String?
+  createdAt DateTime @default(now())
+  
+  @@map("drill_sessions")
+}
