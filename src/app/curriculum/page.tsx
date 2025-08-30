@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button';
 import { 
   BookOpenIcon, 
   PlusIcon, 
-  FilterIcon,
+  FunnelIcon,
   PlayIcon,
   ClockIcon,
   StarIcon
@@ -74,7 +74,7 @@ export default async function CurriculumPage() {
         </div>
         <div className="flex space-x-3">
           <Button variant="secondary" className="flex items-center space-x-2">
-            <FilterIcon className="w-5 h-5" />
+            <FunnelIcon className="w-5 h-5" />
             <span>Filter</span>
           </Button>
           <Link href="/curriculum/new">

@@ -7,7 +7,7 @@ import {
   ClockIcon, 
   UserIcon,
   MapPinIcon,
-  DownloadIcon
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -47,7 +47,7 @@ export default async function ClassesPage() {
         </div>
         <div className="flex space-x-3">
           <Button variant="secondary" className="flex items-center space-x-2">
-            <DownloadIcon className="w-5 h-5" />
+            <ArrowDownTrayIcon className="w-5 h-5" />
             <span>Export</span>
           </Button>
           <Link href="/classes/new">
